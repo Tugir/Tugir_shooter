@@ -12,6 +12,9 @@ class GameSprite(sprite.Sprite):
 				self.rect.y = player_y
 				self.speed = speed
 				self.lifes = 3
+				self.kills = 0
+				self.timer = 0
+				self.interval = 5
 
 		def reset(self):
 				window.blit(self.image, (self.rect.x, self.rect.y))
@@ -23,8 +26,12 @@ class GameSprite(sprite.Sprite):
 				if keys[K_RIGHT]:
 					self.rect.x += 10
 				if keys[K_SPACE]:
-					bullet = Bullet('bullet.png', self.rect.x + 20, self.rect.y, 20, 40, 10)
-					bullets.add(bullet)
+					if self.timer == self.interval:
+					  bullet = Bullet('bullet.png', self.rect.x + 20, self.rect.y, 20, 40, 10)
+					  bullets.add(bullet)
+					  self.timer = 0
+					else:
+					  self.timer += 1
 
 		def enemy_update(self):
 				self.speed = randint(5, 15)
@@ -68,7 +75,11 @@ font1 = font.SysFont('Arial', 40)
 game = True
 while game:
 	window.blit(background, (0, 0))
-	for ev in event.get():
+	text_life = font1.render('Жизни:' + str(hero.lifes), True, (255, 255, 255))
+	window.blit(text_life, (10, 10))
+	text_kills = font1.render('Павшие корабли:' + str(hero.kills), True, (255, 255, 255))
+	window.blit(text_kills, (250, 10))
+	for ev in event.get(): 
 		if ev.type == QUIT:
 			game = False
 	
@@ -77,6 +88,7 @@ while game:
 		print('Осталось', hero.lifes, 'жизней!')
 		enemy1 = GameSprite('ufo.png', randint(0, 640), -60, 60, 60, randint(5, 15))
 		enemies.add(enemy1)
+		hero.kills += 1
 
 	
 	
@@ -85,7 +97,7 @@ while game:
 	if sprite.groupcollide(enemies, bullets, True, True):
 		enemy1 = GameSprite('ufo.png', randint(0, 640), -60, 60, 60, randint(5, 15))
 		enemies.add(enemy1)
-
+		hero.kills += 1
 
 	if hero.lifes <= 0:
 		break
