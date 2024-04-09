@@ -28,6 +28,7 @@ class GameSprite(sprite.Sprite):
 				if keys[K_SPACE]:
 					if self.timer == self.interval:
 					  bullet = Bullet('bullet.png', self.rect.x + 20, self.rect.y, 20, 40, 10)
+					  fire_bullet.play()
 					  bullets.add(bullet)
 					  self.timer = 0
 					else:
@@ -50,7 +51,7 @@ window = display.set_mode((700, 500))
 background = transform.scale(image.load('galaxy.jpg'), (700, 500))
 display.set_caption('стрелялка')
 
-hero = GameSprite('rocket.png', 100, 300, 60, 60, 10)
+hero = GameSprite('rocket.png', 100, 420, 60, 60, 10)
 enemy = GameSprite('ufo.png', randint(0, 640), -60, 60, 60, randint(5, 15))
 enemies = sprite.Group()
 enemy1 = GameSprite('ufo.png', randint(0, 640), -60, 60, 60, randint(5, 15))
@@ -66,7 +67,13 @@ enemies.add(enemy5)
 mixer.init()
 mixer.music.load('space.ogg')
 mixer.music.play(-1)
-
+mixer.music.set_volume(0.1)
+fire_bullet = mixer.Sound('shoot.ogg')
+fire_bullet.set_volume(0.1)
+crash = mixer.Sound('crash.ogg')
+crash.set_volume(0.1)
+damage = mixer.Sound('damage.ogg')
+damage.set_volume(0.1)
 bullets = sprite.Group()
 
 font.init()
@@ -84,6 +91,7 @@ while game:
 			game = False
 	
 	if sprite.spritecollide(hero, enemies, True):
+		damage.play()
 		hero.lifes -= 1
 		print('Осталось', hero.lifes, 'жизней!')
 		enemy1 = GameSprite('ufo.png', randint(0, 640), -60, 60, 60, randint(5, 15))
@@ -95,6 +103,7 @@ while game:
 
 
 	if sprite.groupcollide(enemies, bullets, True, True):
+		crash.play()
 		enemy1 = GameSprite('ufo.png', randint(0, 640), -60, 60, 60, randint(5, 15))
 		enemies.add(enemy1)
 		hero.kills += 1
